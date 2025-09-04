@@ -100,15 +100,16 @@ sensor model.
 
 Imu Sensor Model : 
 
-![Imu sensor model](images/Imu_sensor_model.png "Imu Sensor model")
+![IMU sensor model](images/Imu_sensor_model.png "Imu Sensor model")
 
 Imu Jacobian H : 
 
-![Imu Jacobian](images/imu_jacobian.png "Imu Jacobian")
+![IMU Jacobian](images/imu_jacobian.png "Imu Jacobian")
 
-Imu sensor noise matrix : 
-
-The Imu Sensor models has the 
+The IMU sensor model has the following: theta, theta_dot, ax, and ay. This is the primary way we correct for orientation in the EKF through the help of the IMU.  
+I decided not to integrate the linear accelerations to find the body velocity, as that measurement would accumulate significant error from integrating  
+over time. Additionally, this would require extra computation, since the H matrix for the IMU would need to be computed at every correction step.  
+Therefore, I chose not to use it.
 
 ### Odometry Sensor Model
 
@@ -120,11 +121,34 @@ Odom Jacobian H :
 
 ![Imu Jacobian](images/odom_jacobian.png "Odom Jacobian")
 
+The odom sensor model has the following: x, y, theta, v, and theta_dot. The primary role of odom in the EKF is correcting the velocity prediction. In addition,  
+it also provides corrections for x, y, theta, and theta_dot. However, the other measurements are not very reliable. Since our only sources of x and y are not  
+very accurate and drift over time, the EKF state for x and y will also drift over time.
+
+### Process noise, Sensor noise, and Inital Covariance 
+
+Process noise : 
+
+![R Cov](images/R.png "process noise")
+
+Imu sensor noise matrix : 
+
+![IMU noise Cov](images/q_imu.png "imu sensor noise matrix")
+
 Odom sensor noise matrix : 
 
-### Process noise and Inital Covariance
+![Odom noise cov](images/q_odom.png "Odom sensor noise matrix")
+
+The Covariance tells us about how certain we are about a mesurment. a larage value indicates that we are not very certain about the quantity, while a small value 
+indicates that we are very certain about it. However, we never want the covariance in our filter to drop to 0, as that could lead to our filter colapsing.  
+we start the inital covariance as 10.0, as we want the inital values to get flushed . we can experimentally determine the covariance values, but it easier 
+to tune them though testing. My stratagy will be to assume a base covariance value of 1.0, then increase and decrease based of how certain each mesurment is  
+from this baseline. 
+
 
 ### Improving Numerical Stability
+
+
 
 ## Testing and Results
 
