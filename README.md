@@ -3,7 +3,12 @@ This repo exists to showcase an Extented Kalman Filter I implemented during my c
 The repo contains the ros2 package for the EKF and also contains a breif write explaning  
 the process of making designing and making your own EKF. 
 
-# A Novice's Guide to Designing An Asynchronous Extended Kalman Filter
+# <center>A Novice's Guide to Designing An <br /> Asynchronous Extended Kalman Filter</center>
+
+<p align="center">
+  <img src="images/car_picture.jpg" />
+</p>
+
 
 ## Background and Motivation
 
@@ -212,10 +217,7 @@ matrix7d new_sigma_t = (A * current_predition.sigma_t * A.transpose() + K * Q_od
 
 ## Testing and Results
 
-### Testing Method 
-
-
-### Results
+The method used to produce the following results will be to drive the cars around the following car around the simulated porto track, at race pace using a gamepad.
 
 ## Discussion And Reflection
 
