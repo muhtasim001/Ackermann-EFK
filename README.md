@@ -121,8 +121,8 @@ Odom Jacobian H :
 
 ![Imu Jacobian](images/odom_jacobian.png "Odom Jacobian")
 
-The odom sensor model has the following: x, y, theta, v, and theta_dot. The primary role of odom in the EKF is correcting the velocity prediction. In addition,  
-it also provides corrections for x, y, theta, and theta_dot. However, the other measurements are not very reliable. Since our only sources of x and y are not  
+The odom sensor model has the following: $x$, $y$, ${\theta}$, $v$ , and $\dot{\theta}$. The primary role of odom in the EKF is correcting the velocity prediction. In addition,  
+it also provides corrections for $x$, $y$, $theta$, and $\dot{\theta}$. However, the other measurements are not very reliable. Since our only sources of x and y are not  
 very accurate and drift over time, the EKF state for x and y will also drift over time.
 
 ### Process noise, Sensor noise, and Inital Covariance 
@@ -139,18 +139,66 @@ Odom sensor noise matrix :
 
 ![Odom noise cov](images/q_odom.png "Odom sensor noise matrix")
 
-The Covariance tells us about how certain we are about a mesurment. a larage value indicates that we are not very certain about the quantity, while a small value 
-indicates that we are very certain about it. However, we never want the covariance in our filter to drop to 0, as that could lead to our filter colapsing.  
-we start the inital covariance as 10.0, as we want the inital values to get flushed . we can experimentally determine the covariance values, but it easier 
-to tune them though testing. My stratagy will be to assume a base covariance value of 1.0, then increase and decrease based of how certain each mesurment is  
-from this baseline. 
+Inital Covariance ${\Sigma}_t$ :   
+![Simga T inital](images/sigma_t_inital.png "Inital Covariance of state")
 
+The covariance tells us how certain we are about a measurement. A large value indicates low certainty in the quantity, while a small value indicates high certainty. However, we never want the covariance in our filter to drop to 0, as that could cause the filter to collapse.
+
+We start the initial covariance at 10.0 for all the state variables, since we want the initial values to get flushed out. Although we can experimentally determine the covariance values, it is usually easier to tune them through testing. My strategy is to assume a baseline covariance value of 1.0, then increase or decrease it depending on how certain each measurement is relative to that baseline.
+
+The process noise for $x$, $y$, and $v$ is set to 1.0, as the model does a relatively good job of representing the robot’s linear motion. However, the model struggles to describe turning movements because it cannot account for wheel slip and slip angle. For this reason, we assign a covariance of 5.0 to $\theta$ and $\dot{\theta}$.
+
+Similarly, for the same reasons, we assign $a_x$ and $a_y$ a covariance of 3.5 in the process model. The IMU sensor noise values are lower than those of the process model across all metrics, since the IMU is a fairly reliable source of information for $\theta$, $\dot{\theta}$, $a_x$, and $a_y$.
+
+The odometry sensor noise values are lower than the process model for certain metrics such as $x$ and $y$, but higher than the IMU noise for $\theta$ and $\dot{\theta}$, as the encoders do not handle those measurements very well.
 
 ### Improving Numerical Stability
 
+One of the under-discussed topics in most guides is numerical stability, so I will go over some techniques to address it.
 
+List of techniques: 
+
+1. Avoid direct matrix inversion when computing the Kalman gain.
+
+Direct inversion is numerically unstable. Instead, use an LLT or LDLT solver, as these are much more stable.
+
+incorrect example : 
+```
+matrix5d S = H_odom * result.new_covariance * H_odom.transpose() + Q_odom;
+S = S.inverse();
+matrix5x7d K = result.new_covariance * H_odom.transpose() * S;
+```
+
+Better (LLT solver, with LDLT as a fallback):
+
+```
+matrix4d S = (H_imu * current_predition.sigma_t * H_imu.transpose() + Q_imu).eval(); //inovation covariance
+S = (0.5 * (S + S.transpose())).eval(); //correct the matrix scew 
+Eigen::LLT<matrix4d> llt (S);
+matrix7x4d K;
+K = (current_predition.sigma_t * H_imu.transpose() * llt.solve(matrix4d::Identity())).eval();
+```
+
+2. Correct matrix skew after operations.
+
+Sometimes, due to floating-point errors, a covariance matrix may lose its symmetry. To fix this, you can symmetrize it:
+
+```
+sigma_predicted = (0.5 * (sigma_predicted + sigma_predicted.transpose().eval())).eval();
+```
+
+3. Prevent covariance values from collapsing to zero.
+
+After covariance updates, there is a chance that a diagonal element becomes zero or negative. If this happens, the filter may collapse. To avoid this, add a small jitter (artificial uncertainty):
+
+```
+if (new_sigma_t.diagonal().minCoeff() <= 0) {
+    new_sigma_t.diagonal().array() += 1e-8;
+}
+```
 
 ## Testing and Results
+
 
 ### Testing Method 
 ### Results
