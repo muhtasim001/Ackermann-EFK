@@ -197,10 +197,24 @@ if (new_sigma_t.diagonal().minCoeff() <= 0) {
 }
 ```
 
+4. use Jacobs formula for calculating the the new ${\Sigma}_t$  
+
+when using the standard formula for calculating ${\Sigma}_t$, there is a chance that it can colapse. so it better to use Jacobs Method :  
+
+![Jacobs formula](images/jacobs_formula.png "the jacobs formula")
+
+example code : 
+
+```
+matrix7d A = (matrix7d::Identity() - K * H_odom).eval();
+matrix7d new_sigma_t = (A * current_predition.sigma_t * A.transpose() + K * Q_odom * K.transpose()).eval();
+```
+
 ## Testing and Results
 
-
 ### Testing Method 
+
+
 ### Results
 
 ## Discussion And Reflection
