@@ -37,7 +37,7 @@ target_include_directories(ekf PUBLIC include)
 ament_target_dependencies(ekf rclcpp nav_msgs sensor_msgs tf2_ros tf2_geometry_msgs ackermann_msgs)
 
 install(
-  TARGETS ekf_node ekf 
+  TARGETS ekf 
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
