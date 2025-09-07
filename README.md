@@ -193,8 +193,6 @@ Overall, the filter's performance is within expectations. It doesn't drastically
 
 When looking at the motion model, it is rather simplistic and can capture the motion of the robot. However, when slip is introduced into the equation or fast heading changes occur, the model can't fully capture the robot's motion, as it has no idea of the full system dynamics. This could be improved with a better model, but that would also require more compute. Additionally, my current understanding of vehicle dynamics is also limited, thus further limiting this area. 
 
-Another area where the filter is lacking is not being truly async. The current design uses the ROS2 sequential executor,  
-so the callback functions happen in sequence, rather than truly concurrently. This could be remedied by switching to the concurrent  
-executor, but given the time frame in which this filter was developed and my understanding of concurrency, this was not feasible.  
+Another area where the filter is lacking is not being truly async. The current design uses the ROS2 sequential executor, so the callback functions happen in sequence, rather than truly concurrently. This could be remedied by switching to the concurrent  executor, but given the time frame in which this filter was developed and my understanding of concurrency, this was not feasible.  
 
 Overall I am happy with the outcome, and have learned a lot. However, there is still more to learn, which excites me for the future.
