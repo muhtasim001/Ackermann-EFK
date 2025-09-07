@@ -185,7 +185,7 @@ Yaw Angle Data over 5 laps :
 
 When looking at the velocity data, we can see three distinct lines. If we examine the velocity data from the wheel encoders, we can observe that the velocity is roughly accurate but spikes a lot and deviates from the actual velocity quite frequently. However, when we look at the EKF velocity in green, it is much closer to the actual velocity. It does diverge from it occasionally, but it is still a much better estimate of the velocity.
 
-If we look at the yaw data, we can see that by the time 5 laps are finished, the odometry yaw has significantly drifted from the actual yaw angle. When we look at the EKF yaw data, we can see that it is jumping between the actual yaw value and the odometry yaw value. This is to be expected, as when the EKF does an odometry update step, the yaw gets closer to the odometry value, while during an IMU update step, it gets closer to the actual yaw value. Thus, on average, the yaw value is closer to the actual yaw, accomplishing the objective of the EKF.
+If we look at the yaw data, we can see that by the time 5 laps are finished, the odometry yaw has significantly drifted from the actual yaw angle. When we examine the EKF yaw data, we can see that it is jumping between the actual yaw value and the odometry yaw value. This is to be expected, as when the EKF performs an odometry update step, the yaw gets closer to the odometry value, while during an IMU update step, it gets closer to the actual yaw value. Thus, we see the zig-zagging behavior. On average, the yaw value is closer to the actual yaw, accomplishing the objective of the EKF.
 
 ## Conclusion and Reflection
 
