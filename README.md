@@ -1,7 +1,6 @@
 # About 
-This repo exists to showcase an Extented Kalman Filter I implemented during my co-op at Wato.  
-The repo contains the ros2 package for the EKF and also contains a breif write explaning  
-the process of making designing and making your own EKF. 
+
+This repository showcases an Extended Kalman Filter (EKF) that I implemented during my co-op at Wato.It contains the ROS2 package for the EKF, along with a brief guide* outlining the process of designing and implementing your own EKF. This is not intended to be a comprehensive tutorial on EKFs, but rather a reflection of my approach, design choices, and lessons learned while developing this particular implementation. Please note: the code is currently a bit messy and the parameter file is missing, but it will be added in the future. If you would like to use this in your own project and need the parameter file in the meantime, feel free to reach out to me. 
 
 # <center>A Novice's Guide to Designing An <br /> Asynchronous Extended Kalman Filter</center>
 
