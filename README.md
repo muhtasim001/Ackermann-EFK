@@ -58,21 +58,11 @@ The control inputs for the robot are velocity and steering angle, so they are us
 
 ![Jacobian G](images/Jacobian_G.png "Jacobian G")
 
-$G$ is is the Jacobain / slope of the motion model $g$. It is a nesscary part of the Extended Kalman Filter, as it helps us linearize our non linear function  
-so that we can appply the Kalman Filter framework to them. I recomend using Software such as matlab or octave to calculate this for you, as getting it wrong can   
-seriously affect your EKF
+$G$ is is the Jacobain / slope of the motion model $g$. It is a nesscary part of the Extended Kalman Filter, as it helps us linearize our non linear function so that we can appply the Kalman Filter framework to them. I recomend using Software such as matlab or octave to calculate this for you, as getting it wrong can seriously affect your EKF
 
 ### Multiple Sensor Models and Asynchrony
 
-This is where things diverge a little from other guides. Generally, most other sources I found online talk about the single-sensor case for the EKF, but gloss over  
-how to implement a multi-sensor version. Thus, I will try my best to explain the process. To start out, we must first define the motivation for asynchronous   
-multi-sensor EKF. Given we have two sensors, a common strategy that is often employed is to bundle all the sensor information into one correction step. However,  
-this can be rather inefficient, as you will either end up wasting sensor information (in the case of having a high-frequency sensor and a low-frequency one) or  
-using stale sensor information (incorporating outdated data, leading to poor correction). To remedy this, we will use one sensor model per sensor. This way we can  
-have a higher update rate for our EKF and improve performance by only using the most current data. The basic idea will be to predict when we have new control  
-inputs and accept the predicted state and covariance as the estimated state, while also storing the control inputs. Next, when new sensor information arrives, we  
-predict again from the time we last updated to the arrival of the sensor data using the stored control inputs, then perform the correction step with the correct   
-sensor model.
+This is where things diverge a little from other guides. Generally, most other sources I found online talk about the single-sensor case for the EKF, but gloss over how to implement a multi-sensor version. Thus, I will try my best to explain the process. To start out, we must first define the motivation for asynchronous multi-sensor EKF. Given we have two sensors, a common strategy that is often employed is to bundle all the sensor information into one correction step. However, this can be rather inefficient, as you will either end up wasting sensor information (in the case of having a high-frequency sensor and a low-frequency one) or using stale sensor information (incorporating outdated data, leading to poor correction). To remedy this, we will use one sensor model per sensor. This way we can have a higher update rate for our EKF and improve performance by only using the most current data. The basic idea will be to predict when we have new control inputs and accept the predicted state and covariance as the estimated state, while also storing the control inputs. Next, when new sensor information arrives, we predict again from the time we last updated to the arrival of the sensor data using the stored control inputs, then perform the correction step with the correct sensor model.
 
 ### IMU Sensor Model
 
@@ -84,10 +74,7 @@ Imu Jacobian H :
 
 ![IMU Jacobian](images/imu_jacobian.png "Imu Jacobian")
 
-The IMU sensor model has the following: theta, theta_dot, ax, and ay. This is the primary way we correct for orientation in the EKF through the help of the IMU.  
-I decided not to integrate the linear accelerations to find the body velocity, as that measurement would accumulate significant error from integrating  
-over time. Additionally, this would require extra computation, since the H matrix for the IMU would need to be computed at every correction step.  
-Therefore, I chose not to use it.
+The IMU sensor model has the following: theta, theta_dot, ax, and ay. This is the primary way we correct for orientation in the EKF through the help of the IMU. I decided not to integrate the linear accelerations to find the body velocity, as that measurement would accumulate significant error from integrating over time. Additionally, this would require extra computation, since the H matrix for the IMU would need to be computed at every correction step. Therefore, I chose not to use it.
 
 ### Odometry Sensor Model
 
@@ -99,9 +86,7 @@ Odom Jacobian H :
 
 ![Imu Jacobian](images/odom_jacobian.png "Odom Jacobian")
 
-The odom sensor model has the following: $x$, $y$, ${\theta}$, $v$ , and $\dot{\theta}$. The primary role of odom in the EKF is correcting the velocity prediction. In addition,  
-it also provides corrections for $x$, $y$, $theta$, and $\dot{\theta}$. However, the other measurements are not very reliable. Since our only sources of x and y are not  
-very accurate and drift over time, the EKF state for x and y will also drift over time.
+The odom sensor model has the following: $x$, $y$, ${\theta}$, $v$ , and $\dot{\theta}$. The primary role of odom in the EKF is correcting the velocity prediction. In addition, it also provides corrections for $x$, $y$, $theta$, and $\dot{\theta}$. However, the other measurements are not very reliable. Since our only sources of x and y are not very accurate and drift over time, the EKF state for x and y will also drift over time.
 
 ### Process noise, Sensor noise, and Inital Covariance 
 
